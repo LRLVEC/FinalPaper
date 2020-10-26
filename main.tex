@@ -18,39 +18,6 @@
 \CTEXsetup[format={\Large\bfseries}]{section}
 \usetikzlibrary{arrows, shapes, positioning, calc, mindmap}
 
-\newcommand{\drawE}[9]
-%#1: point
-%#2: name index
-%#3: name subindex
-%#4: length of the line 'k'
-%#5: angle between k and the vertical line
-%#4: position of the 'S'
-%#5: position of the 'P'
-%#6: position of the 'Ep'
-%#7: position of the 'Ex'
-{
-    \coordinate (K) at ($(#1)+(#5:#4)$);
-    \coordinate (P) at ($(#1)+(#5+90:#4)$);
-    \coordinate (X) at ($(#1)+({#4*cos(#5+90)}, 0)$);
-    \coordinate (Z) at ($(#1)+(0, {#4*sin(#5+90)})$);
-
-    \node at (#1) [inner sep=0.5mm, circle, draw=blue, thick] {};
-    \node at (#1) [inner sep=0.3mm, circle, fill=blue] {};
-    \node at (K) [right=0.2] {$\vec{k}_#2{#3}$};
-    \node at ($(#1)+#6$) [align=center] {$\vec{s}_#2{#3}$\\$\vec{E}_{#2s}{#3}=-\vec{E}_{#2y}{#3}$};
-    \node at ($(P)+#7$) {$\vec{p}_#2{#3}$};
-    \node at ($(P)+#8$) {$\vec{E}_{#2p}{#3}$};
-    \node at (X) [#9] {$\vec{E}_{#2x}{#3}$};
-    \node at (Z) [above] {$\vec{E}_{#2z}{#3}$};
-
-    \draw[->, blue, line width=1pt] (#1)--(K);
-    \draw[->, blue, line width=1pt] (#1)--(P);
-    \draw[->, blue, line width=0.5pt] (#1)--(X);
-    \draw[dash pattern=on 2pt off 1pt, blue, line width=0.5pt] (X)--(P);
-    \draw[->, blue, line width=0.5pt] (#1)--(Z);
-    \draw[dash pattern=on 2pt off 1pt, blue, line width=0.5pt] (Z)--(P);
-}
-
 \makeatletter
 \newenvironment{breakablealgorithm}
 {% \begin{breakablealgorithm}
@@ -81,7 +48,6 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-  
 \end{abstract}
 
 \section{介绍}
@@ -368,11 +334,11 @@
         \begin{equation}
             \overrightarrow{r}_{dir}=M_{rotate}(\overrightarrow{r}_{hit}-\overrightarrow{r}_{right})
         \end{equation}
-        根据这个方向，利用投影矩阵即可得到裁剪空间的$x,y$值（范围是[-1, 1]，而且由于只需要$x, y$值，所以这个方向也可以不归一化）。设裁剪坐标是$\overrightarrow{r}_{scissor}$
+        根据这个方向，利用投影矩阵即可得到裁剪空间的$x,y$值（范围是[-1, 1]，而且由于只需要$x, y$值，所以$\overrightarrow{r}_{dir}$也可以不归一化）。设裁剪坐标是$\overrightarrow{r}_{scissor}$
         \begin{equation}
             \overrightarrow{r}_{scissor}=M_{proj}\overrightarrow{r}_{dir}
         \end{equation}
-        最后裁剪坐标乘以屏幕长宽即可得到像素位置
+        最后裁剪坐标归一化后乘以屏幕长宽即可得到像素位置
         \begin{equation}
             \begin{array}{c}
                 index.x=\lfloor\frac{1}{2}(\overrightarrow{r}_{scissor}.x+1)size.x\rfloor\\
