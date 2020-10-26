@@ -1,7 +1,5 @@
-% \documentclass{article}
 \documentclass[UTF8]{ctexart}
 \usepackage[utf8]{inputenc}
-% \usepackage[utf8]{ctex}
 \usepackage{tabu}
 \usepackage{geometry}
 \usepackage{CJK}
@@ -15,6 +13,7 @@
 \usepackage{algorithmic}
 \usepackage{float}
 \usepackage{lipsum}
+\CTEXsetup[format={\Large\bfseries}]{section}
 \makeatletter
 \newenvironment{breakablealgorithm}
 {% \begin{breakablealgorithm}
@@ -72,7 +71,7 @@
         遍历）的硬件电路，相比传统的在着色器里面自己实现的光线求教快数倍。而且其还保留对自己实现的其他种类图元（如自己实现的球的求教）求交的支持，只要提供求交
         函数和最小包围盒的函数即可。不过在大多数情况下具有硬件加速的三角形求交性能会远好于其他图元的实现，而且在现代大型游戏中基本上所有的三维网格都是由三
         角形构成的，所以这里我们的场景将只采用中等规模的三角形图元数量。
-    \subsection{VR和OpenVR}    
+    \subsection{VR和OpenVR}
     \subsection{我们的贡献}
 \section{基本框架}
 \section{方法}
