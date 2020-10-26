@@ -8,12 +8,49 @@
 \usepackage{graphicx}
 \usepackage{multirow}
 \usepackage{cite}
+\usepackage{tikz}
 
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage{float}
 \usepackage{lipsum}
+
 \CTEXsetup[format={\Large\bfseries}]{section}
+\usetikzlibrary{arrows, shapes, positioning, calc, mindmap}
+
+\newcommand{\drawE}[9]
+%#1: point
+%#2: name index
+%#3: name subindex
+%#4: length of the line 'k'
+%#5: angle between k and the vertical line
+%#4: position of the 'S'
+%#5: position of the 'P'
+%#6: position of the 'Ep'
+%#7: position of the 'Ex'
+{
+    \coordinate (K) at ($(#1)+(#5:#4)$);
+    \coordinate (P) at ($(#1)+(#5+90:#4)$);
+    \coordinate (X) at ($(#1)+({#4*cos(#5+90)}, 0)$);
+    \coordinate (Z) at ($(#1)+(0, {#4*sin(#5+90)})$);
+
+    \node at (#1) [inner sep=0.5mm, circle, draw=blue, thick] {};
+    \node at (#1) [inner sep=0.3mm, circle, fill=blue] {};
+    \node at (K) [right=0.2] {$\vec{k}_#2{#3}$};
+    \node at ($(#1)+#6$) [align=center] {$\vec{s}_#2{#3}$\\$\vec{E}_{#2s}{#3}=-\vec{E}_{#2y}{#3}$};
+    \node at ($(P)+#7$) {$\vec{p}_#2{#3}$};
+    \node at ($(P)+#8$) {$\vec{E}_{#2p}{#3}$};
+    \node at (X) [#9] {$\vec{E}_{#2x}{#3}$};
+    \node at (Z) [above] {$\vec{E}_{#2z}{#3}$};
+
+    \draw[->, blue, line width=1pt] (#1)--(K);
+    \draw[->, blue, line width=1pt] (#1)--(P);
+    \draw[->, blue, line width=0.5pt] (#1)--(X);
+    \draw[dash pattern=on 2pt off 1pt, blue, line width=0.5pt] (X)--(P);
+    \draw[->, blue, line width=0.5pt] (#1)--(Z);
+    \draw[dash pattern=on 2pt off 1pt, blue, line width=0.5pt] (Z)--(P);
+}
+
 \makeatletter
 \newenvironment{breakablealgorithm}
 {% \begin{breakablealgorithm}
@@ -37,6 +74,7 @@
 
 \bibliographystyle{unsrt}
 \geometry{left=2.0cm,right=2.0cm,top=3cm,bottom=3cm}
+
 \title{面向VR头盔的实时真实感绘制系统}
 \author{}
 \date{\today}
@@ -70,10 +108,69 @@
         可以指定的 \_\_shared\_\_ memory，同一warp的线程同步等特性进行进行加速，而且NVIDIA Turing和Ampere架构显卡具有专门用于光线求交（包括与三角形和BVH
         遍历）的硬件电路，相比传统的在着色器里面自己实现的光线求教快数倍。而且其还保留对自己实现的其他种类图元（如自己实现的球的求教）求交的支持，只要提供求交
         函数和最小包围盒的函数即可。不过在大多数情况下具有硬件加速的三角形求交性能会远好于其他图元的实现，而且在现代大型游戏中基本上所有的三维网格都是由三
-        角形构成的，所以这里我们的场景将只采用中等规模的三角形图元数量。
+        角形构成的，所以这里我们的场景将只采用三角形图元，数量为中等规模。
     \subsection{VR和OpenVR}
+        VR（Virtual Reality，虚拟现实），作为一种具有强大交互能力的表现方式，已经新兴与各种需要实时交互的领域，如用于教育、医疗、模型设计和军事训练等等。OpenVR作
+        为被多个VR设备厂家支持的API标准和SDK，作为VR硬件和软件的接口对市面上多种VR设备具有良好的兼容性。又因为其API语言也是C++，与CUDA和OptiX能完美契合，所以我们
+        选择OpenVR作为给VR硬件开发的API。
     \subsection{我们的贡献}
+        目前VR渲染方式的主流仍然是光栅化渲染。虽然在各种技术如阴影贴图，预烘培的光照图等方式改善，但是对于十分影响观感真实性的反射折射等光线条件复杂的场景
+        仍然很难处理。而光线追踪能改善这种非真实性。但是由于光线追踪与生俱来的计算复杂度，必须采用蒙特卡洛方法才能达到实时的性能。但是蒙特卡洛方法具有的缺
+        陷是当采样数不够时（显然在实时渲染时每像素采样数（SPP，samples per pixel）会非常低，大部分时候甚至只有1）,即使使用了强大的神经网络降噪模型，仍然会
+        由于信息量不够导致效果很差，除非使用多帧融合降噪模型（如NVIDIA的DLSS2.0及以上的技术）。这里我们将采用光子映射的方式来避免像素级别的噪点，提升观感。
+        
+        为了在实现光子映射的同时保证较高的实时性，我们做出了以下贡献：
 \section{基本框架}
+    由于这个光线追踪VR项目牵扯到很多方面，例如模块化的交互输入处理，OpenGL作为传递给OpenVR API渲染数据的中间桥梁，CUDA作为异构计算的重要组成部分，导致整个
+    项目框架比较庞大，所以需要搭建一个良好的框架并使用抽象的面向对象编程来逐一完成这些任务。以下为此框架的构成：\\
+    \begin{center}
+        \begin{tikzpicture}
+            [
+                mindmap,
+                every node/.style={concept, execute at begin node=\hskip0pt},
+                root concept/.append style=
+                {
+                    concept color=black, fill=white, line width=1ex, text=black
+                },
+                text=white,
+                grow cyclic,
+                level 1/.append style = {level distance = 5cm, sibling angle=90},
+                level 2/.append style = {level distance = 3cm, sibling angle=45}
+            ]
+            \definecolor{nvGreen}{rgb}{0.462, 0.725, 0}
+            \definecolor{glBlue}{rgb}{0.33203125, 0.5234375, 0.6484375}
+            \node [root concept] {Project}
+            child [concept color=nvGreen, grow=30]
+            {
+                node {CUDA}
+                child{node {OptiX}}
+            }
+            child [concept color=glBlue, grow=-30]
+            {
+                node {OpenGL}
+                child[grow=-30]{node {OpenVR}}
+                child[grow=-70]{node {Texture}}
+            }
+            child [concept color=brown, grow=0]
+            {
+                node {Miscellaneous}
+                child[grow=40]{node {Math}}
+                child[grow=0]{node {Window}}
+                child[grow=-40]{node {GLFW}}
+            };
+        \end{tikzpicture}
+    \end{center}
+    \subsection{CUDA}
+        这个CUDA框架主要是对CUDA中Buffer和纹理的封装，使得OptiX能顺利读取各种纹理和Buffer数据等。还包含了一个简化版的随机数库，用于在光追中在不占用过多内存
+        的情况下快速生成随机数以采样。
+    \subsection{OpenGL}
+        这个OpenGL框架包含了基础的OpenGL特性的抽象封装，包括各种Buffer，对着色器的编译和渲染程序的封装等等，但是并没有类似游戏引擎的过度封装，即渲染管线仍然
+        是可以高度自定义的。例如在这个光追VR项目中我们将OpenGL中的Pixel Unpack Buffer传给CUDA和OptiX渲染，完成后将其转换为Texture Buffer，再由OpenGL渲染到窗
+        口和另外2个（左右眼）提交给OpenVR的Texture上，这样就算完成了一次左右眼及窗口的渲染。
+    \subsection{杂项}
+        剩下的杂项包含图形学常用数学库、窗口管理和GLFW库控制的交互。其中数学库包含了各种低维（2，3，4维）向量和矩阵的运算，如求矩阵逆和矩阵转置等操作。这些操作
+        在处理从OpenVR得到的各种变换矩阵和位置向量的时候十分有用；窗口管理则具备了管理多个Windows窗口的能力，虽然这里只用上了一个用于同步展示头盔内部图像的
+        窗口；GLFW库则是用于管理键盘鼠标控制交互的库。
 \section{方法}
     \subsection{改善内存访问模式}
         传统的光子映射算法\cite{jensen2000practical}常常选用kd-树\cite{1975Multidimensional}作为保存光子图的数据结构，它会将光子平均地进行划分然后保存在数
