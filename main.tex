@@ -96,7 +96,9 @@
 \section{基本框架}
     由于这个光线追踪VR项目牵扯到很多方面，例如模块化的交互输入处理，OpenGL作为传递给OpenVR API渲染数据的中间桥梁，CUDA作为异构计算的重要组成部分，导致整个
     项目框架比较庞大，所以需要搭建一个良好的框架并使用抽象的面向对象编程来逐一完成这些任务。以下为此框架的构成：\\
-    \begin{center}
+    
+    \begin{figure}[h]
+        \centering
         \begin{tikzpicture}
             [
                 mindmap,
@@ -132,7 +134,9 @@
                 child[grow=-40]{node {GLFW}}
             };
         \end{tikzpicture}
-    \end{center}
+        \caption{项目框架图}
+        \label{fig:0}
+    \end{figure}
     \subsection{CUDA}
         这个CUDA框架主要是对CUDA中Buffer和纹理的封装，使得OptiX能顺利读取各种纹理和Buffer数据等。还包含了一个简化版的随机数库，用于在光追中在不占用过多内存
         的情况下快速生成随机数以采样。
@@ -185,10 +189,10 @@
         的哈希值，在此之后依据哈希值从大到小将光子重新排序，下图是扫描得到的前缀和数组startIdx，它表明在0、7、9、14号小立方体中分别存在1、1、2、1个光子。
         
         \begin{figure}[htbp]
-        \centering
-        \includegraphics[scale=0.6]{pic/HashGridPhotonRebuild.png}
-        \caption{哈希网格光子图重构示意图}
-        \label{fig:1}
+            \centering
+            \includegraphics[scale=0.6]{pic/HashGridPhotonRebuild.png}
+            \caption{哈希网格光子图重构示意图}
+            \label{fig:1}
         \end{figure}
         
         在哈希网格中进行搜索的过程如图\ref{fig:2}所示，蓝点代表需要进行密度估计的点，它所在的小立方体的编号为10，根据偏移查看表，光子图中下标从startIdx[5]开始
