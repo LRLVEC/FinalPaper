@@ -53,7 +53,7 @@
 \section{介绍}
     目前VR渲染方式的主流仍然是光栅化渲染。虽然在各种技术如阴影贴图，预烘培的光照图等方式改善，但是对于十分影响观感真实性的反射折射等光线条件复杂的场景
     仍然很难处理。而光线追踪能改善这种非真实性。但是由于光线追踪与生俱来的计算复杂度，必须采用蒙特卡洛方法才能达到实时的性能。但是蒙特卡洛方法具有的缺
-    陷是当采样数不够时（显然在实时渲染时每像素采样数（SPP，samples per pixel）会非常低，大部分时候甚至只有1）,即使使用了强大的神经网络降噪模型，仍然会
+    陷是当采样数不够时（显然在实时渲染时每像素采样数（SPP，samples per pixel）会非常低，大部分时候甚至只有1），即使使用了强大的神经网络降噪模型，仍然会
     由于信息量不够导致效果很差，除非使用多帧融合降噪模型（如NVIDIA的DLSS2.0及以上的技术）。这里我们将采用光子映射的方式来避免像素级别的噪点，提升观感。
     \subsection{光线追踪和光子映射}
         长期以来，快速绘制具有高质量真实感的画面一直是计算机图形学的目标。在诸多的算法中，光线追踪提供了一种成功的模拟全局光照明的方案。
@@ -86,7 +86,7 @@
     \subsection{我们的贡献}
         为了在实现光子映射的同时保证较高的实时性，我们做出了以下贡献：
 
-        1、搭建了一套能灵活实现的光线追踪（光子映射方案）的框架；
+        1、基于OptiX光线追踪引擎，搭建了VR头盔上高度真实感绘制的框架；
 
         2、提出了一种利用在VR设备中双眼图像的相关性，减少重复操作以加快绘制的方法；
 
@@ -95,8 +95,10 @@
         4、通过改善内存访问模式、利用硬件加快并行等方法加速绘制过程，在简单场景下达到了实时渲染的帧率要求。
 \section{基本框架}
     由于这个光线追踪VR项目牵扯到很多方面，例如模块化的交互输入处理，OpenGL作为传递给OpenVR API渲染数据的中间桥梁，CUDA作为异构计算的重要组成部分，导致整个
-    项目框架比较庞大，所以需要搭建一个良好的框架并使用抽象的面向对象编程来逐一完成这些任务。以下为此框架的构成：\\
-    \begin{center}
+    项目框架比较庞大，所以需要搭建一个良好的框架并使用抽象的面向对象编程来逐一完成这些任务。图\ref{fig:0}是项目框架的构成示意图：\\
+    
+    \begin{figure}[h]
+        \centering
         \begin{tikzpicture}
             [
                 mindmap,
@@ -112,7 +114,7 @@
             ]
             \definecolor{nvGreen}{rgb}{0.462, 0.725, 0}
             \definecolor{glBlue}{rgb}{0.33203125, 0.5234375, 0.6484375}
-            \node [root concept] {Project}
+            \node [root concept] {\textbf{Project}}
             child [concept color=nvGreen, grow=30]
             {
                 node {CUDA}
@@ -132,7 +134,9 @@
                 child[grow=-40]{node {GLFW}}
             };
         \end{tikzpicture}
-    \end{center}
+        \caption{项目框架图}
+        \label{fig:0}
+    \end{figure}
     \subsection{CUDA}
         这个CUDA框架主要是对CUDA中Buffer和纹理的封装，使得OptiX能顺利读取各种纹理和Buffer数据等。还包含了一个简化版的随机数库，用于在光追中在不占用过多内存
         的情况下快速生成随机数以采样。
@@ -185,10 +189,10 @@
         的哈希值，在此之后依据哈希值从大到小将光子重新排序，下图是扫描得到的前缀和数组startIdx，它表明在0、7、9、14号小立方体中分别存在1、1、2、1个光子。
         
         \begin{figure}[htbp]
-        \centering
-        \includegraphics[scale=0.6]{pic/HashGridPhotonRebuild.png}
-        \caption{哈希网格光子图重构示意图}
-        \label{fig:1}
+            \centering
+            \includegraphics[scale=0.6]{pic/HashGridPhotonRebuild.png}
+            \caption{哈希网格光子图重构示意图}
+            \label{fig:1}
         \end{figure}
         
         在哈希网格中进行搜索的过程如图\ref{fig:2}所示，蓝点代表需要进行密度估计的点，它所在的小立方体的编号为10，根据偏移查看表，光子图中下标从startIdx[5]开始
@@ -389,8 +393,11 @@
         \end{table}
         
         然后我们比较了是否使用最大堆对绘制时间的影响，结果列在表\ref{table:2}中。可以看到，这一步带来的加速是显著的，背后的原因主要是减少了位于全局内存中的堆的访问以及堆
-        维护的操作开销。如前所述，这样做让那些本来最终保存在堆中的光子的贡献降低，同时会计算更多本来不会被保存在堆中的光子，这样做会使得最终得到的图像更加模糊。在后续的
-        实验中都不使用堆。
+        维护的操作开销。如前所述，这样做让那些本来最终保存在堆中的光子的贡献降低，同时会计算更多本来不会被保存在堆中的光子，这样做会使得最终得到的图像更加模糊。
+        
+        在图\ref{fig:8}中我们展示了是否使用堆对于间接光照的影响，左图是使用大小为128的堆得到的结果，右图是不使用堆得到的结果，两者发射的光子数都是$512\times512$，
+        搜索半径都是$0.08$，除了亮度，两者的区别并不是很明显，左图比较暗的原因是128的堆大小过小，而右图可以取用数量更多的光子进行密度估计。
+        在后续的实验中都不使用堆。
         
         \begin{table}[htbp]
         \centering
@@ -410,6 +417,20 @@
         \hline\hline
         \end{tabular}
         \end{table}
+
+        \begin{figure}[htbp]
+        \centering
+        \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=8cm]{pic/useheap.jpg}
+        \end{minipage}
+        \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=8cm]{pic/withoutHeap.jpg}
+        \end{minipage}
+        \caption{是否使用堆的渲染效果对比}
+        \label{fig:8}
+        \end{figure}
         
         在表\ref{table:3}中，我们比较了使用OptiX内核同时执行光线追踪和密度估计的方案（单一方案）与只使用OptiX内核进行光线追踪而使用CUDA内核执行密度估计的方案（混合方
         案）。可以看到，即使额外增加了OptiX内核和CUDA内核之间传递交点信息的通信开销，使用混合方案大体上也只需要单一方案的一半的时间。可能的解释是，OptiX在执行像密度估计
@@ -463,7 +484,7 @@
         \hline\hline
         发射光子数 & 搜索半径 & 双眼分开绘制  & 利用双眼相关性绘制  \\
         \hline\hline
-    \multirow{3}*{$512\times512$} & 0.05   &   &   \\  
+        \multirow{3}*{$512\times512$} & 0.05   &   &   \\  
         ~   & 0.1   &   &  \\
         ~   & 0.2   &   &  \\
         \hline
@@ -473,6 +494,15 @@
         \hline\hline
         \end{tabular}
         \end{table}
+
+        在图\ref{fig:9}中展示了最后的渲染效果，我们采用的发射光子数为$512\times512$，搜集半径为$0.2$，所需要的渲染时间为35.38ms。
+
+        \begin{figure}[htbp]
+        \centering
+        \includegraphics[scale=0.6]{pic/final.jpg}
+        \caption{最终渲染效果}
+        \label{fig:9}
+        \end{figure}
 \section{结论}
 
 \section{不足和改进}
