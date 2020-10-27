@@ -380,17 +380,17 @@
         \hline\hline
         发射光子数 & 搜索半径 & kd-树  & 哈希网格  \\
         \hline\hline
-        \multirow{3}*{$512\times512$} & 0.02   & 10.80ms   & \textbf{6.15ms} \\
-        ~   & 0.05  & 112.30ms  & \textbf{84.50ms} \\
-        ~   & 0.1   & \textbf{470.31ms}  & 567.70ms \\
+        \multirow{3}*{$512\times512$} & 0.02   & 7.28ms   & \textbf{3.89ms} \\
+        ~   & 0.05  & 118.35ms  & \textbf{90.74ms} \\
+        ~   & 0.1   & \textbf{426.39ms}  & 501.79ms \\
         \hline
-        \multirow{3}*{$256\times256$} & 0.05   & 12.48ms   & \textbf{7.05ms} \\
-        ~   & 0.1  & 67.91ms  & \textbf{48.68ms} \\
-        ~   & 0.2   & \textbf{314.21ms}  & 419.63ms \\
+        \multirow{3}*{$256\times256$} & 0.05   & 8.32ms   & \textbf{5.23ms} \\
+        ~   & 0.1  & 72.05ms  & \textbf{49.29ms} \\
+        ~   & 0.2   & \textbf{287.87ms}  & 362.10ms \\
         \hline
-        \multirow{3}*{$128\times128$} & 0.05   & 3.58ms   & \textbf{3.03ms}  \\
-        ~   & 0.1   & 8.17ms   & \textbf{5.73ms} \\
-        ~   & 0.2   & 38.81ms   & \textbf{27.16ms} \\
+        \multirow{3}*{$128\times128$} & 0.05   & 2.57ms   & \textbf{1.94ms}  \\
+        ~   & 0.1   & 5.69ms   & \textbf{3.67ms} \\
+        ~   & 0.2   & 36.29ms   & \textbf{22.90ms} \\
         \hline\hline
         \end{tabular}
         \end{table}
@@ -410,13 +410,13 @@
         \hline\hline
         发射光子数 & 搜索半径 & 使用堆  & 不使用堆  \\
         \hline\hline
-        \multirow{3}*{$512\times512$} & 0.02   & 6.61ms  & \textbf{3.27ms}  \\
-        ~   & 0.05  & 84.87ms  & \textbf{8.26ms} \\
-        ~   & 0.1   & 583.50ms  & \textbf{23.16ms} \\
+        \multirow{3}*{$512\times512$} & 0.02   & 3.89ms  & \textbf{2.33ms}  \\
+        ~   & 0.05  & 90.74ms  & \textbf{4.36ms} \\
+        ~   & 0.1   & 501.79ms  & \textbf{11.43ms} \\
         \hline
-        \multirow{3}*{$256\times256$} & 0.05   & 7.53ms  & \textbf{3.50ms}  \\
-        ~   & 0.1   & 49.30ms  & \textbf{6.54ms} \\
-        ~   & 0.2   & 414.93ms  & \textbf{20.16ms} \\
+        \multirow{3}*{$256\times256$} & 0.05   & 5.23ms  & \textbf{2.30ms}  \\
+        ~   & 0.1   & 49.29ms  & \textbf{3.94ms} \\
+        ~   & 0.2   & 362.10ms  & \textbf{11.24ms} \\
         \hline\hline
         \end{tabular}
         \end{table}
@@ -425,11 +425,11 @@
         \centering
         \begin{minipage}[t]{0.48\textwidth}
         \centering
-        \includegraphics[width=8cm]{pic/useheap.jpg}
+        \includegraphics[width=8cm]{pic/useheap.png}
         \end{minipage}
         \begin{minipage}[t]{0.48\textwidth}
         \centering
-        \includegraphics[width=8cm]{pic/withoutHeap.jpg}
+        \includegraphics[width=8cm]{pic/withoutHeap.png}
         \end{minipage}
         \caption{是否使用堆的渲染效果对比}
         \label{fig:8}
@@ -447,13 +447,13 @@
         \hline\hline
         发射光子数 & 搜索半径 & 单一方案  & 混合方案  \\
         \hline\hline
-        \multirow{3}*{$512\times512$} & 0.05  & 7.59ms  & \textbf{4.48ms} \\
-        ~   & 0.1   & 22.01ms  & \textbf{10.46ms} \\
-        ~   & 0.2   & 77.92ms  & \textbf{36.82ms} \\
+        \multirow{3}*{$512\times512$} & 0.05  & 4.59ms  & \textbf{3.41ms} \\
+        ~   & 0.1   & 12.39ms  & \textbf{6.52ms} \\
+        ~   & 0.2   & 37.60ms  & \textbf{17.51ms} \\
         \hline
-        \multirow{3}*{$256\times256$} & 0.05   & 3.47ms  & \textbf{2.85ms} \\
-        ~   & 0.1   & 6.39ms  & \textbf{4.12ms} \\
-        ~   & 0.2   & 20.04ms  & \textbf{10.55ms} \\
+        \multirow{3}*{$256\times256$} & 0.05   & 2.60ms  & \textbf{2.31ms} \\
+        ~   & 0.1   & 4.03ms  & \textbf{3.76ms} \\
+        ~   & 0.2   & 10.66ms  & \textbf{6.00ms} \\
         \hline\hline
         \end{tabular}
         \end{table}
@@ -469,13 +469,13 @@
         \hline\hline
         发射光子数 & 搜索半径 & 不使用共享内存  & 使用共享内存  \\
         \hline\hline
-        \multirow{3}*{$512\times512$} & 0.05   & \textbf{4.63ms}  & 4.95ms  \\
-        ~   & 0.1   & 11.86ms  & \textbf{10.57ms} \\
-        ~   & 0.2   & 34.76ms  & \textbf{32.01ms} \\
+        \multirow{3}*{$512\times512$} & 0.05   & 3.41ms  & \textbf{3.18ms}  \\
+        ~   & 0.1   & 6.52ms  & \textbf{6.33ms} \\
+        ~   & 0.2   & 17.51ms  & \textbf{15.88ms} \\
         \hline
-        \multirow{3}*{$256\times256$} & 0.05   & 2.82ms  & \textbf{2.79ms}  \\
-        ~   & 0.1   & \textbf{4.12ms}  & 4.25ms \\
-        ~   & 0.2   & 10.52ms  & \textbf{9.30ms} \\
+        \multirow{3}*{$256\times256$} & 0.05   & 2.31ms  & \textbf{2.25ms}  \\
+        ~   & 0.1   & 3.76ms  & \textbf{3.06ms} \\
+        ~   & 0.2   & 6.00ms  & \textbf{5.80ms} \\
         \hline\hline
         \end{tabular}
         \end{table}
@@ -497,12 +497,11 @@
         \hline\hline
         \end{tabular}
         \end{table}
-
-        在图\ref{fig:9}中展示了最后的渲染效果，我们采用的发射光子数为$512\times512$，搜集半径为$0.2$，所需要的渲染时间为35.38ms。
+        在图\ref{fig:9}中展示了最后的渲染效果，我们采用的发射光子数为$512\times512$，搜集半径为$0.2$，所需要的渲染时间为18.38ms。
 
         \begin{figure}[htbp]
         \centering
-        \includegraphics[scale=0.6]{pic/final.jpg}
+        \includegraphics[scale=0.6]{pic/final.png}
         \caption{最终渲染效果}
         \label{fig:9}
         \end{figure}
