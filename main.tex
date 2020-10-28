@@ -378,21 +378,23 @@
         \centering
         \caption{采用不同数据结构绘制帧时间的比较}
         \label{table:1}
-        \begin{tabular}{llll}
+        \begin{tabular}{ll|ll|ll}
         \hline\hline
-        发射光子数 & 搜索半径 & kd-树  & 哈希网格  \\
+        \multicolumn{2}{c}{参数} & \multicolumn{2}{c}{Cornell Box} & \multicolumn{2}{c}{Office}  \\
+        \hline
+        发射光子数 & 搜索半径 & kd-树  & 哈希网格  & kd-树  & 哈希网格 \\
         \hline\hline
-        \multirow{3}*{$512\times512$} & 0.02   & 7.28ms   & \textbf{3.89ms} \\
-        ~   & 0.05  & 118.35ms  & \textbf{90.74ms} \\
-        ~   & 0.1   & \textbf{426.39ms}  & 501.79ms \\
+        \multirow{3}*{$512\times512$} & 0.02   & 7.28ms   & \textbf{3.89ms} &    &    \\
+        ~   & 0.05  & 118.35ms  & \textbf{90.74ms} &    &    \\
+        ~   & 0.1   & \textbf{426.39ms}  & 501.79ms &    &    \\
         \hline
-        \multirow{3}*{$256\times256$} & 0.05   & 8.32ms   & \textbf{5.23ms} \\
-        ~   & 0.1  & 72.05ms  & \textbf{49.29ms} \\
-        ~   & 0.2   & \textbf{287.87ms}  & 362.10ms \\
+        \multirow{3}*{$256\times256$} & 0.05   & 8.32ms   & \textbf{5.23ms} &    &    \\
+        ~   & 0.1  & 72.05ms  & \textbf{49.29ms} &    &    \\
+        ~   & 0.2   & \textbf{287.87ms}  & 362.10ms &    &    \\
         \hline
-        \multirow{3}*{$128\times128$} & 0.05   & 2.57ms   & \textbf{1.94ms}  \\
-        ~   & 0.1   & 5.69ms   & \textbf{3.67ms} \\
-        ~   & 0.2   & 36.29ms   & \textbf{22.90ms} \\
+        \multirow{3}*{$128\times128$} & 0.05   & 2.57ms   & \textbf{1.94ms}  &    &    \\
+        ~   & 0.1   & 5.69ms   & \textbf{3.67ms} &    &    \\
+        ~   & 0.2   & 36.29ms   & \textbf{22.90ms} &    &    \\
         \hline\hline
         \end{tabular}
         \end{table}
@@ -408,17 +410,19 @@
         \centering
         \caption{是否使用堆绘制帧时间的比较}
         \label{table:2}
-        \begin{tabular}{llll}
+        \begin{tabular}{ll|ll|ll}
         \hline\hline
-        发射光子数 & 搜索半径 & 使用堆  & 不使用堆  \\
-        \hline\hline
-        \multirow{3}*{$512\times512$} & 0.02   & 3.89ms  & \textbf{2.33ms}  \\
-        ~   & 0.05  & 90.74ms  & \textbf{4.36ms} \\
-        ~   & 0.1   & 501.79ms  & \textbf{11.43ms} \\
+        \multicolumn{2}{c}{参数} & \multicolumn{2}{c}{Cornell Box} & \multicolumn{2}{c}{Office}  \\
         \hline
-        \multirow{3}*{$256\times256$} & 0.05   & 5.23ms  & \textbf{2.30ms}  \\
-        ~   & 0.1   & 49.29ms  & \textbf{3.94ms} \\
-        ~   & 0.2   & 362.10ms  & \textbf{11.24ms} \\
+        发射光子数 & 搜索半径 & 使用堆  & 不使用堆 & 使用堆  & 不使用堆 \\
+        \hline\hline
+        \multirow{3}*{$512\times512$} & 0.02   & 3.89ms  & \textbf{2.33ms} &    &    \\
+        ~   & 0.05  & 90.74ms  & \textbf{4.36ms} &    &    \\
+        ~   & 0.1   & 501.79ms  & \textbf{11.43ms} &    &    \\
+        \hline
+        \multirow{3}*{$256\times256$} & 0.05   & 5.23ms  & \textbf{2.30ms} &    &    \\
+        ~   & 0.1   & 49.29ms  & \textbf{3.94ms} &    &    \\
+        ~   & 0.2   & 362.10ms  & \textbf{11.24ms} &    &    \\
         \hline\hline
         \end{tabular}
         \end{table}
@@ -445,17 +449,19 @@
         \centering
         \caption{使用不同内核绘制帧时间的比较}
         \label{table:3}
-        \begin{tabular}{llll}
+        \begin{tabular}{ll|ll|ll}
         \hline\hline
-        发射光子数 & 搜索半径 & 单一方案  & 混合方案  \\
-        \hline\hline
-        \multirow{3}*{$512\times512$} & 0.05  & 4.59ms  & \textbf{3.41ms} \\
-        ~   & 0.1   & 12.39ms  & \textbf{6.52ms} \\
-        ~   & 0.2   & 37.60ms  & \textbf{17.51ms} \\
+        \multicolumn{2}{c}{参数} & \multicolumn{2}{c}{Cornell Box} & \multicolumn{2}{c}{Office}  \\
         \hline
-        \multirow{3}*{$256\times256$} & 0.05   & 2.60ms  & \textbf{2.31ms} \\
-        ~   & 0.1   & 4.03ms  & \textbf{3.76ms} \\
-        ~   & 0.2   & 10.66ms  & \textbf{6.00ms} \\
+        发射光子数 & 搜索半径 & 单一方案 & 混合方案 & 单一方案 & 混合方案 \\
+        \hline\hline
+        \multirow{3}*{$512\times512$} & 0.05  & 4.59ms  & \textbf{3.41ms} &    &  \\
+        ~   & 0.1   & 12.39ms  & \textbf{6.52ms} &    &  \\
+        ~   & 0.2   & 37.60ms  & \textbf{17.51ms} &    &  \\
+        \hline
+        \multirow{3}*{$256\times256$} & 0.05   & 2.60ms  & \textbf{2.31ms} &    &  \\
+        ~   & 0.1   & 4.03ms  & \textbf{3.76ms} &    &  \\
+        ~   & 0.2   & 10.66ms  & \textbf{6.00ms} &    &  \\
         \hline\hline
         \end{tabular}
         \end{table}
@@ -467,17 +473,19 @@
         \centering
         \caption{是否使用共享内存绘制帧时间的比较}
         \label{table:4}
-        \begin{tabular}{llll}
+        \begin{tabular}{ll|ll|ll}
         \hline\hline
-        发射光子数 & 搜索半径 & 不使用共享内存  & 使用共享内存  \\
-        \hline\hline
-        \multirow{3}*{$512\times512$} & 0.05   & 3.41ms  & \textbf{3.18ms}  \\
-        ~   & 0.1   & 6.52ms  & \textbf{6.33ms} \\
-        ~   & 0.2   & 17.51ms  & \textbf{15.88ms} \\
+        \multicolumn{2}{c}{参数} & \multicolumn{2}{c}{Cornell Box} & \multicolumn{2}{c}{Office}  \\
         \hline
-        \multirow{3}*{$256\times256$} & 0.05   & 2.31ms  & \textbf{2.25ms}  \\
-        ~   & 0.1   & 3.76ms  & \textbf{3.06ms} \\
-        ~   & 0.2   & 6.00ms  & \textbf{5.80ms} \\
+        发射光子数 & 搜索半径 & 不使用共享内存  & 使用共享内存 & 不使用共享内存  & 使用共享内存 \\
+        \hline\hline
+        \multirow{3}*{$512\times512$} & 0.05   & 3.41ms  & \textbf{3.18ms} &    &  \\
+        ~   & 0.1   & 6.52ms  & \textbf{6.33ms} &    &  \\
+        ~   & 0.2   & 17.51ms  & \textbf{15.88ms} &    &  \\
+        \hline
+        \multirow{3}*{$256\times256$} & 0.05   & 2.31ms  & \textbf{2.25ms} &    &  \\
+        ~   & 0.1   & 3.76ms  & \textbf{3.06ms} &    &  \\
+        ~   & 0.2   & 6.00ms  & \textbf{5.80ms} &    &  \\
         \hline\hline
         \end{tabular}
         \end{table}
@@ -485,27 +493,37 @@
         \begin{table}[htbp]
         \centering
         \caption{两种绘制方式绘制帧时间的比较}
-        \begin{tabular}{llll}
+        \begin{tabular}{ll|ll|ll}
         \hline\hline
-        发射光子数 & 搜索半径 & 双眼分开绘制  & 利用双眼相关性绘制  \\
-        \hline\hline
-        \multirow{3}*{$512\times512$} & 0.05   &   &   \\  
-        ~   & 0.1   &   &  \\
-        ~   & 0.2   &   &  \\
+        \multicolumn{2}{c}{参数} & \multicolumn{2}{c}{Cornell Box} & \multicolumn{2}{c}{Office}  \\
         \hline
-        \multirow{3}*{$256\times256$} & 0.05   &   &   \\ 
-        ~   & 0.1   &   &  \\
-        ~   & 0.2   &   &  \\
+        发射光子数 & 搜索半径 & 双眼分开绘制  & 利用双眼相关性绘制 & 双眼分开绘制  & 利用双眼相关性绘制 \\
+        \hline\hline
+        \multirow{3}*{$512\times512$} & 0.05   &   &   &   &   \\ 
+        ~   & 0.1   &   &   &   &   \\ 
+        ~   & 0.2   &   &   &   &   \\ 
+        \hline
+        \multirow{3}*{$256\times256$} & 0.05   &   &   &   &   \\ 
+        ~   & 0.1   &   &   &   &   \\ 
+        ~   & 0.2   &   &   &   &   \\ 
         \hline\hline
         \end{tabular}
         \end{table}
-        在图\ref{fig:9}中展示了最后的渲染效果，我们采用的发射光子数为$512\times512$，搜集半径为$0.2$，所需要的渲染时间为18.38ms。
+        在图\ref{fig:9}和图\ref{fig:10}中展示了最后的渲染效果，在Cornell Box场景中我们采用的发射光子数为$512\times512$，搜集半径为$0.2$，所需要的渲染时间为18.38ms。
+        在Office场景（72万个三角片元）中我们采用的发射光子数为$512\times512$，搜集半径为$0.15$，所需要的渲染时间为16.91ms。
 
         \begin{figure}[htbp]
         \centering
-        \includegraphics[scale=0.6]{pic/final.png}
-        \caption{最终渲染效果}
+        \includegraphics[scale=0.5]{pic/CornellBox.png}
+        \caption{Cornell Box最终渲染效果}
         \label{fig:9}
+        \end{figure}
+
+        \begin{figure}[htbp]
+        \centering
+        \includegraphics[scale=0.5]{pic/office.png}
+        \caption{Office最终渲染效果}
+        \label{fig:10}
         \end{figure}
 \section{结论}
     基于OptiX光线追踪引擎，我们搭建了一个VR平台上高度真实感绘制的框架，为VR设备上的真实感渲染提供了平台。通过实验验证，我们证明了利用VR设备
