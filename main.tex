@@ -14,9 +14,14 @@
 \usepackage{algorithmic}
 \usepackage{float}
 \usepackage{lipsum}
+\usepackage{subfigure}
 
 \CTEXsetup[format={\Large\bfseries}]{section}
 \usetikzlibrary{arrows, shapes, positioning, calc, mindmap}
+
+\makeatletter 
+\renewcommand{\@thesubfigure}{\hskip\subfiglabelskip}
+\makeatother
 
 \makeatletter
 \newenvironment{breakablealgorithm}
@@ -190,7 +195,7 @@
         重构光子图的过程如图\ref{fig:1}所示：左上图是场景中光子分布的示意，其中小立方体的编号用红色表示，光子的编号用黑色表示。右上图计算了场景中的每个光子
         的哈希值，在此之后依据哈希值从大到小将光子重新排序，下图是扫描得到的前缀和数组startIdx，它表明在0、7、9、14号小立方体中分别存在1、1、2、1个光子。
         
-        \begin{figure}[htbp]
+        \begin{figure}[H]
             \centering
             \includegraphics[scale=0.6]{pic/HashGridPhotonRebuild.png}
             \caption{哈希网格光子图重构示意图}
@@ -201,7 +206,7 @@
         到startIdx[8]之前，从startIdx[9]开始到startIdx[12]之前，从startIdx[13]开始到startIdx[16]之前的光子可能会对这个点产生贡献，也就是0，2，3，1号光子。最终0号
         光子由于距离过远被剔除，其他的光子参与最终贡献的计算。
         
-        \begin{figure}[htbp]
+        \begin{figure}[H]
         \centering
         \includegraphics[scale=0.6]{pic/HashGridSearch.png}
         \caption{哈希网格搜索}
@@ -228,7 +233,7 @@
         当前堆中最远的光子（蓝色实线圈与蓝色虚线圈之间的光子）要近，于是进行替代并发生了“半径收缩”。值得一提的是，利用图\ref{fig:6}可以展示哈希网格的缺点：在使用kd-树的方案中，
         虚线圈外的三个光子由于给定点到它们的分隔平面距离过远，都是不需要访问的，而在使用哈希网格的方案中，由于所有的光子都在给定点周围的方格内，所有的光子都需要被访问到。
 
-        \begin{figure}[htbp]
+        \begin{figure}[H]
         \centering
         \includegraphics[scale=0.8]{pic/KNN.png}
         \caption{堆与KNN示意图}
@@ -254,7 +259,7 @@
         个线程加载一个光子（由黑色实线箭头表示），然后这两个线程会从共享内存中获取光子的信息，然后进行密度估计（黑色点虚线箭头表示）。然后这两个线程再次从全局内存中加载另外
         的两个光子到共享内存（蓝色实线箭头表示），然后再从共享内存中读取光子信息（黑色点虚线箭头表示）。
         
-        \begin{figure}[htbp]
+        \begin{figure}[H]
         \centering
         \includegraphics[scale=0.7]{pic/SharedMemory.png}
         \caption{共享内存利用示意图}
@@ -329,7 +334,7 @@
         线），做可见性判断，如果是可见的，就计算这个右眼光线对应的屏幕上的像素的坐标c\_index。如果这个坐标位于屏幕像素的范围内，那么在buffer[c\_index]中将记录该点在右眼
         中的颜色。这样当在绘制右眼屏幕坐标为c\_index的像素的时候，查看buffer[c\_index]发现已经有值了，于是直接将这个值读到帧缓存对应的位置中。
         
-        \begin{figure}[htbp]
+        \begin{figure}[H]
         \centering
         \includegraphics[scale=0.6]{pic/BinocularCorrelation.png}
         \caption{双眼图像相关性示意图}
@@ -359,7 +364,7 @@
         读取并将其与某特定非零值进行比较，若相等，则表明这个像素已经被其他左眼像素对应的线程写入了，无需再写入一遍；若不相等（即为0），则表明尚未被写入，可以直接将其写入那个特定
         非零值并向$xyz$分量写入颜色信息。对计算得到的像素位置，必须进行越界检查，确保只有在屏幕范围内的像素被绘制，否则可能会造成内存访问的错误。
         
-        \begin{figure}[htbp]
+        \begin{figure}[H]
         \centering
         \includegraphics[scale=0.6]{pic/IndexCalculation.png}
         \caption{像素位置计算示意图}
@@ -367,36 +372,36 @@
         \end{figure}
 \section{实验}
     \subsection{实验设备}
-        我们使用的显卡是，VR设备是。测试得到的帧时间都是连续绘制100帧然后取平均值，前4项实验中并没有使用到VR，都是记录了单张图像的平均绘制时间，
+        我们使用的显卡是RTX2080Ti，VR设备是HTC Vive。测试得到的帧时间都是连续绘制100帧然后取平均值，前4项实验中并没有使用到VR，都是记录了单张图像的平均绘制时间，
         最后一项实验中使用了VR，记录了双眼图像的平均绘制时间。我们测试了使用不同的发射光子数和搜索半径的结果。每一项中得到的最好的结果用粗体强调。
     \subsection{实验结果}
         我们首先比较了使用传统的kd-树和哈希网格作为光子图的数据结构时的绘制帧时间，结果列在表\ref{table:1}中。可以看到，当发射的光子数和搜索半径不太大时，使用哈希网格会起
         到加速效果；当发射的光子数增多，半径也相应变大的时候。哈希网格的速度又比使用kd-树更慢了，如前文所述，哈希网格提供更紧凑的内存访问的代价是很多没有贡献的光子也会被
         访问到。在随后的实验中，我们都将使用哈希网格作为光子图数据结构。
         
-        \begin{table}[htbp]
-        \centering
-        \caption{采用不同数据结构绘制帧时间的比较}
-        \label{table:1}
-        \begin{tabular}{ll|ll|ll}
-        \hline\hline
-        \multicolumn{2}{c}{参数} & \multicolumn{2}{c}{Cornell Box} & \multicolumn{2}{c}{Office}  \\
-        \hline
-        发射光子数 & 搜索半径 & kd-树  & 哈希网格  & kd-树  & 哈希网格 \\
-        \hline\hline
-        \multirow{3}*{$512\times512$} & 0.02   & 7.28ms   & \textbf{3.89ms} &    &    \\
-        ~   & 0.05  & 118.35ms  & \textbf{90.74ms} &    &    \\
-        ~   & 0.1   & \textbf{426.39ms}  & 501.79ms &    &    \\
-        \hline
-        \multirow{3}*{$256\times256$} & 0.05   & 8.32ms   & \textbf{5.23ms} &    &    \\
-        ~   & 0.1  & 72.05ms  & \textbf{49.29ms} &    &    \\
-        ~   & 0.2   & \textbf{287.87ms}  & 362.10ms &    &    \\
-        \hline
-        \multirow{3}*{$128\times128$} & 0.05   & 2.57ms   & \textbf{1.94ms}  &    &    \\
-        ~   & 0.1   & 5.69ms   & \textbf{3.67ms} &    &    \\
-        ~   & 0.2   & 36.29ms   & \textbf{22.90ms} &    &    \\
-        \hline\hline
-        \end{tabular}
+        \begin{table}[H]
+            \centering
+            \caption{采用不同数据结构绘制帧时间的比较}
+            \label{table:1}
+            \begin{tabular}{ll|ll|ll}
+            \hline\hline
+            \multicolumn{2}{c}{参数} & \multicolumn{2}{c}{Cornell Box} & \multicolumn{2}{c}{Office}  \\
+            \hline
+            发射光子数 & 搜索半径 & kd-树  & 哈希网格  & kd-树  & 哈希网格 \\
+            \hline\hline
+            \multirow{3}*{$512\times512$} & 0.02   & 7.28ms   & \textbf{3.89ms} &    &    \\
+            ~   & 0.05  & 118.35ms  & \textbf{90.74ms} &    &    \\
+            ~   & 0.1   & \textbf{426.39ms}  & 501.79ms &    &    \\
+            \hline
+            \multirow{3}*{$256\times256$} & 0.05   & 8.32ms   & \textbf{5.23ms} &    &    \\
+            ~   & 0.1  & 72.05ms  & \textbf{49.29ms} &    &    \\
+            ~   & 0.2   & \textbf{287.87ms}  & 362.10ms &    &    \\
+            \hline
+            \multirow{3}*{$128\times128$} & 0.05   & 2.57ms   & \textbf{1.94ms}  &    &    \\
+            ~   & 0.1   & 5.69ms   & \textbf{3.67ms} &    &    \\
+            ~   & 0.2   & 36.29ms   & \textbf{22.90ms} &    &    \\
+            \hline\hline
+            \end{tabular}
         \end{table}
         
         然后我们比较了是否使用最大堆对绘制时间的影响，结果列在表\ref{table:2}中。可以看到，这一步带来的加速是显著的，背后的原因主要是减少了位于全局内存中的堆的访问以及堆
@@ -406,125 +411,146 @@
         搜索半径都是$0.08$，除了亮度，两者的区别并不是很明显，左图比较暗的原因是128的堆大小过小，而右图可以取用数量更多的光子进行密度估计。
         在后续的实验中都不使用堆。
         
-        \begin{table}[htbp]
-        \centering
-        \caption{是否使用堆绘制帧时间的比较}
-        \label{table:2}
-        \begin{tabular}{ll|ll|ll}
-        \hline\hline
-        \multicolumn{2}{c}{参数} & \multicolumn{2}{c}{Cornell Box} & \multicolumn{2}{c}{Office}  \\
-        \hline
-        发射光子数 & 搜索半径 & 使用堆  & 不使用堆 & 使用堆  & 不使用堆 \\
-        \hline\hline
-        \multirow{3}*{$512\times512$} & 0.02   & 3.89ms  & \textbf{2.33ms} &    &    \\
-        ~   & 0.05  & 90.74ms  & \textbf{4.36ms} &    &    \\
-        ~   & 0.1   & 501.79ms  & \textbf{11.43ms} &    &    \\
-        \hline
-        \multirow{3}*{$256\times256$} & 0.05   & 5.23ms  & \textbf{2.30ms} &    &    \\
-        ~   & 0.1   & 49.29ms  & \textbf{3.94ms} &    &    \\
-        ~   & 0.2   & 362.10ms  & \textbf{11.24ms} &    &    \\
-        \hline\hline
-        \end{tabular}
+        \begin{table}[H]
+            \centering
+            \caption{是否使用堆绘制帧时间的比较}
+            \label{table:2}
+            \begin{tabular}{ll|ll|ll}
+            \hline\hline
+            \multicolumn{2}{c}{参数} & \multicolumn{2}{c}{Cornell Box} & \multicolumn{2}{c}{Office}  \\
+            \hline
+            发射光子数 & 搜索半径 & 使用堆  & 不使用堆 & 使用堆  & 不使用堆 \\
+            \hline\hline
+            \multirow{3}*{$512\times512$} & 0.02   & 3.89ms  & \textbf{2.33ms} &    &    \\
+            ~   & 0.05  & 90.74ms  & \textbf{4.36ms} &    &    \\
+            ~   & 0.1   & 501.79ms  & \textbf{11.43ms} &    &    \\
+            \hline
+            \multirow{3}*{$256\times256$} & 0.05   & 5.23ms  & \textbf{2.30ms} &    &    \\
+            ~   & 0.1   & 49.29ms  & \textbf{3.94ms} &    &    \\
+            ~   & 0.2   & 362.10ms  & \textbf{11.24ms} &    &    \\
+            \hline\hline
+            \end{tabular}
         \end{table}
 
-        \begin{figure}[htbp]
-        \centering
-        \begin{minipage}[t]{0.48\textwidth}
-        \centering
-        \includegraphics[width=8cm]{pic/useheap.png}
-        \end{minipage}
-        \begin{minipage}[t]{0.48\textwidth}
-        \centering
-        \includegraphics[width=8cm]{pic/withoutHeap.png}
-        \end{minipage}
-        \caption{是否使用堆的渲染效果对比}
-        \label{fig:8}
+        \begin{figure}[H]
+            \centering
+            \begin{minipage}[t]{0.48\textwidth}
+            \centering
+            \includegraphics[width=8cm]{pic/useheap.png}
+            \end{minipage}
+            \begin{minipage}[t]{0.48\textwidth}
+            \centering
+            \includegraphics[width=8cm]{pic/withoutHeap.png}
+            \end{minipage}
+            \caption{是否使用堆的渲染效果对比}
+            \label{fig:8}
         \end{figure}
         
         在表\ref{table:3}中，我们比较了使用OptiX内核同时执行光线追踪和密度估计的方案（单一方案）与只使用OptiX内核进行光线追踪而使用CUDA内核执行密度估计的方案（混合方案）。
         可以看到，即使额外增加了OptiX内核和CUDA内核之间传递交点信息的通信开销，使用混合方案大体上也只需要单一方案的一半的时间。可能的解释是，OptiX没有充分利用到CUDA的能力，
         在执行像密度估计这样更加通用的并行任务上的效率不如基础的CUDA高。在后续的实验中我们都将使用混合的方案。
         
-        \begin{table}[htbp]
-        \centering
-        \caption{使用不同内核绘制帧时间的比较}
-        \label{table:3}
-        \begin{tabular}{ll|ll|ll}
-        \hline\hline
-        \multicolumn{2}{c}{参数} & \multicolumn{2}{c}{Cornell Box} & \multicolumn{2}{c}{Office}  \\
-        \hline
-        发射光子数 & 搜索半径 & 单一方案 & 混合方案 & 单一方案 & 混合方案 \\
-        \hline\hline
-        \multirow{3}*{$512\times512$} & 0.05  & 4.59ms  & \textbf{3.41ms} &    &  \\
-        ~   & 0.1   & 12.39ms  & \textbf{6.52ms} &    &  \\
-        ~   & 0.2   & 37.60ms  & \textbf{17.51ms} &    &  \\
-        \hline
-        \multirow{3}*{$256\times256$} & 0.05   & 2.60ms  & \textbf{2.31ms} &    &  \\
-        ~   & 0.1   & 4.03ms  & \textbf{3.76ms} &    &  \\
-        ~   & 0.2   & 10.66ms  & \textbf{6.00ms} &    &  \\
-        \hline\hline
-        \end{tabular}
+        \begin{table}[H]
+            \centering
+            \caption{使用不同内核绘制帧时间的比较}
+            \label{table:3}
+            \begin{tabular}{ll|ll|ll}
+            \hline\hline
+            \multicolumn{2}{c}{参数} & \multicolumn{2}{c}{Cornell Box} & \multicolumn{2}{c}{Office}  \\
+            \hline
+            发射光子数 & 搜索半径 & 单一方案 & 混合方案 & 单一方案 & 混合方案 \\
+            \hline\hline
+            \multirow{3}*{$512\times512$} & 0.05  & 4.59ms  & \textbf{3.41ms} &    &  \\
+            ~   & 0.1   & 12.39ms  & \textbf{6.52ms} &    &  \\
+            ~   & 0.2   & 37.60ms  & \textbf{17.51ms} &    &  \\
+            \hline
+            \multirow{3}*{$256\times256$} & 0.05   & 2.60ms  & \textbf{2.31ms} &    &  \\
+            ~   & 0.1   & 4.03ms  & \textbf{3.76ms} &    &  \\
+            ~   & 0.2   & 10.66ms  & \textbf{6.00ms} &    &  \\
+            \hline\hline
+            \end{tabular}
         \end{table}
         
         在表\ref{table:4}中展示了使用算法\ref{alg:1}的效果，起到的效果并不明显，查看profile发现整个程序运行的瓶颈并不在于内存访问，而在于密度估计中用到的大量的运算。尽管
         如此，算法\ref{alg:1}提供了利用共享内存对整个密度估计进行加速的独创思路。
         
-        \begin{table}[htbp]
-        \centering
-        \caption{是否使用共享内存绘制帧时间的比较}
-        \label{table:4}
-        \begin{tabular}{ll|ll|ll}
-        \hline\hline
-        \multicolumn{2}{c}{参数} & \multicolumn{2}{c}{Cornell Box} & \multicolumn{2}{c}{Office}  \\
-        \hline
-        发射光子数 & 搜索半径 & 不使用共享内存  & 使用共享内存 & 不使用共享内存  & 使用共享内存 \\
-        \hline\hline
-        \multirow{3}*{$512\times512$} & 0.05   & 3.41ms  & \textbf{3.18ms} &    &  \\
-        ~   & 0.1   & 6.52ms  & \textbf{6.33ms} &    &  \\
-        ~   & 0.2   & 17.51ms  & \textbf{15.88ms} &    &  \\
-        \hline
-        \multirow{3}*{$256\times256$} & 0.05   & 2.31ms  & \textbf{2.25ms} &    &  \\
-        ~   & 0.1   & 3.76ms  & \textbf{3.06ms} &    &  \\
-        ~   & 0.2   & 6.00ms  & \textbf{5.80ms} &    &  \\
-        \hline\hline
-        \end{tabular}
+        \begin{table}[H]
+            \centering
+            \caption{是否使用共享内存绘制帧时间的比较}
+            \label{table:4}
+            \begin{tabular}{ll|ll|ll}
+            \hline\hline
+            \multicolumn{2}{c}{参数} & \multicolumn{2}{c}{Cornell Box} & \multicolumn{2}{c}{Office}  \\
+            \hline
+            发射光子数 & 搜索半径 & 不使用共享内存  & 使用共享内存 & 不使用共享内存  & 使用共享内存 \\
+            \hline\hline
+            \multirow{3}*{$512\times512$} & 0.05   & 3.41ms  & \textbf{3.18ms} &    &  \\
+            ~   & 0.1   & 6.52ms  & \textbf{6.33ms} &    &  \\
+            ~   & 0.2   & 17.51ms  & \textbf{15.88ms} &    &  \\
+            \hline
+            \multirow{3}*{$256\times256$} & 0.05   & 2.31ms  & \textbf{2.25ms} &    &  \\
+            ~   & 0.1   & 3.76ms  & \textbf{3.06ms} &    &  \\
+            ~   & 0.2   & 6.00ms  & \textbf{5.80ms} &    &  \\
+            \hline\hline
+            \end{tabular}
         \end{table}
         
-        \begin{table}[htbp]
-        \centering
-        \caption{两种绘制方式绘制帧时间的比较}
-        \begin{tabular}{ll|ll|ll}
-        \hline\hline
-        \multicolumn{2}{c}{参数} & \multicolumn{2}{c}{Cornell Box} & \multicolumn{2}{c}{Office}  \\
-        \hline
-        发射光子数 & 搜索半径 & 双眼分开绘制  & 利用双眼相关性绘制 & 双眼分开绘制  & 利用双眼相关性绘制 \\
-        \hline\hline
-        \multirow{3}*{$512\times512$} & 0.05   &   &   &   &   \\ 
-        ~   & 0.1   &   &   &   &   \\ 
-        ~   & 0.2   &   &   &   &   \\ 
-        \hline
-        \multirow{3}*{$256\times256$} & 0.05   &   &   &   &   \\ 
-        ~   & 0.1   &   &   &   &   \\ 
-        ~   & 0.2   &   &   &   &   \\ 
-        \hline\hline
-        \end{tabular}
+        \begin{table}[H]
+            \centering
+            \caption{两种绘制方式绘制帧时间的比较}
+            \begin{tabular}{ll|ll|ll}
+            \hline\hline
+            \multicolumn{2}{c}{参数} & \multicolumn{2}{c}{Cornell Box} & \multicolumn{2}{c}{Office}  \\
+            \hline
+            发射光子数 & 搜索半径 & 双眼分开绘制  & 利用双眼相关性绘制 & 双眼分开绘制  & 利用双眼相关性绘制 \\
+            \hline\hline
+            \multirow{3}*{$512\times512$} & 0.05   &   &   &   &   \\ 
+            ~   & 0.1   &   &   &   &   \\ 
+            ~   & 0.2   &   &   &   &   \\ 
+            \hline
+            \multirow{3}*{$256\times256$} & 0.05   &   &   &   &   \\ 
+            ~   & 0.1   &   &   &   &   \\ 
+            ~   & 0.2   &   &   &   &   \\ 
+            \hline\hline
+            \end{tabular}
         \end{table}
         在图\ref{fig:9}和图\ref{fig:10}中展示了最后的渲染效果，在Cornell Box场景中我们采用的发射光子数为$512\times512$，搜集半径为$0.2$，所需要的渲染时间为18.38ms。
-        在Office场景（72万个三角片元）中我们采用的发射光子数为$512\times512$，搜集半径为$0.15$，所需要的渲染时间为16.91ms。
+        在Office场景（71万个三角片元）中我们采用的发射光子数为$512\times512$，搜集半径为$0.15$，所需要的渲染时间为11.96ms。
 
-        \begin{figure}[htbp]
-        \centering
-        \includegraphics[scale=0.5]{pic/CornellBox.png}
-        \caption{Cornell Box最终渲染效果}
-        \label{fig:9}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=10cm]{pic/CornellBox.png}
+            \caption{Cornell Box最终渲染效果}
+            \label{fig:9}
         \end{figure}
 
-        \begin{figure}[htbp]
-        \centering
-        \includegraphics[scale=0.5]{pic/office.png}
-        \caption{Office最终渲染效果}
-        \label{fig:10}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=16cm]{pic/office.png}
+            \caption{Office最终渲染效果}
+            \label{fig:10}
         \end{figure}
+
+        此外，我们还发现光子映射对于画质的真实感有较大提升。如下图所示，从左至右依次为全局光照，直接光照和间接光照图，从上至下依次为
+        办公室整体场景、蓝色椅子背部、键盘架附近和办公椅下方：
+        \begin{figure}[H]
+            \centering
+            \subfigure{\includegraphics[width=5.5cm]{pic/office.png}}
+            \subfigure{\includegraphics[width=5.5cm]{pic/office_direct.png}}
+            \subfigure{\includegraphics[width=5.5cm]{pic/office_indirect.png}}
+            \subfigure{\includegraphics[width=5.5cm]{pic/chair.png}}
+            \subfigure{\includegraphics[width=5.5cm]{pic/chair_direct.png}}
+            \subfigure{\includegraphics[width=5.5cm]{pic/chair_indirect.png}}
+            \subfigure{\includegraphics[width=5.5cm]{pic/keyboard.png}}
+            \subfigure{\includegraphics[width=5.5cm]{pic/keyboard_direct.png}}
+            \subfigure{\includegraphics[width=5.5cm]{pic/keyboard_indirect.png}}
+            \subfigure{\includegraphics[width=5.5cm]{pic/under_chair.png}}
+            \subfigure{\includegraphics[width=5.5cm]{pic/under_chair_direct.png}}
+            \subfigure{\includegraphics[width=5.5cm]{pic/under_chair_indirect.png}}
+        \end{figure}
+        在蓝色椅子背部可以看到，光子映射显著增强了亮处和暗处的亮度，还有键盘附近可以发现光子映射让本来完全处于阴影区的键盘支架导轨
+        变得可见，使办公椅下面的RGB灯光产生的光照产生的阴影更加真实。
+
 \section{结论}
     基于OptiX光线追踪引擎，我们搭建了一个VR平台上高度真实感绘制的框架，为VR设备上的真实感渲染提供了平台。通过实验验证，我们证明了利用VR设备
     双眼图像之间的相关性避免重复的操作，以加速绘制的过程是可行的。通过改善内存访问模式和充分利用硬件设备进行并行计算，我们对基于光子映射的渲
