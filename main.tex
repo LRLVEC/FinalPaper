@@ -385,7 +385,7 @@
         到加速效果；当发射的光子数增多，半径也相应变大的时候。哈希网格的速度又比使用kd-树更慢了，如前文所述，哈希网格提供更紧凑的内存访问的代价是很多没有贡献的光子也会被
         访问到。在随后的实验中，我们都将使用哈希网格作为光子图数据结构。
         
-        \begin{table}[htbp]
+        \begin{table}[H]
             \centering
             \caption{采用不同数据结构绘制帧时间的比较}
             \label{table:1}
@@ -415,7 +415,7 @@
         搜索半径都是$0.08$，除了亮度，两者的区别并不是很明显，左图比较暗的原因是128的堆大小过小，而右图可以取用数量更多的光子进行密度估计。
         在后续的实验中都不使用堆。
         
-        \begin{table}[htbp]
+        \begin{table}[H]
             \centering
             \caption{是否使用堆绘制帧时间的比较}
             \label{table:2}
@@ -452,7 +452,7 @@
         可以看到，即使额外增加了OptiX内核和CUDA内核之间传递交点信息的通信开销，使用混合方案大体上也只需要单一方案的一半的时间。可能的解释是，OptiX没有充分利用到CUDA的能力，
         在执行像密度估计这样更加通用的并行任务上的效率不如基础的CUDA高。在后续的实验中我们都将使用混合的方案。
         
-        \begin{table}[htbp]
+        \begin{table}[H]
             \centering
             \caption{使用不同内核绘制帧时间的比较}
             \label{table:3}
@@ -474,7 +474,7 @@
         在表\ref{table:4}中展示了使用算法\ref{alg:1}的效果，起到的效果并不明显，查看profile发现整个程序运行的瓶颈并不在于内存访问，而在于密度估计中用到的大量的运算。尽管
         如此，算法\ref{alg:1}提供了利用共享内存对整个密度估计进行加速的独创思路。
         
-        \begin{table}[htbp]
+        \begin{table}[H]
             \centering
             \caption{是否使用共享内存绘制帧时间的比较}
             \label{table:4}
@@ -493,20 +493,24 @@
             \end{tabular}
         \end{table}
         
-        \begin{table}[htbp]
+        在表\ref{table:5}中展示了使用双眼相关性的效果，发现还是有很明显的加速效果。测试场景为Office，固定产生光子的随机数和头盔位置以保证测量结果准确。虽然左眼在绘制的时候向右眼
+        写入光照值会带来额外的随机访存，但是随着收集半径的增大，收集光子的耗时越来越久，从而使用共享的直接和间接光照会有较好的加速效果。
+
+        \begin{table}[H]
             \centering
             \caption{两种绘制方式绘制帧时间的比较}
+            \label{table:5}
             \begin{tabular}{llll}
             \hline\hline
             发射光子数 & 搜索半径 & 双眼分开绘制  & 利用双眼相关性绘制  \\
             \hline\hline
-            \multirow{3}*{$512\times512$} & 0.05   &   &   \\  
-            ~   & 0.1   &   &  \\
-            ~   & 0.2   &   &  \\
+            \multirow{3}*{$512\times512$} & 0.05   & 15.22ms  & \textbf{13.14ms}  \\  
+            ~   & 0.1   & 25.01ms  & \textbf{22.30ms} \\
+            ~   & 0.15   & 33.42ms  & \textbf{24.52ms} \\
             \hline
-            \multirow{3}*{$256\times256$} & 0.05   &   &   \\ 
-            ~   & 0.1   &   &  \\
-            ~   & 0.2   &   &  \\
+            \multirow{3}*{$256\times256$} & 0.05 & 11.19ms  &  \textbf{11.12ms} \\ 
+            ~   & 0.1   & 13.97ms  & \textbf{11.19ms} \\
+            ~   & 0.15  &16.19ms & \textbf{12.73ms} \\
             \hline\hline
             \end{tabular}
         \end{table}
